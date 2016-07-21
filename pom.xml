@@ -342,6 +342,24 @@
                 </plugins>
             </build>
         </profile>
+
+		<profile>
+			<id>jit</id>
+			<properties>
+				<nexus.url>${env.JIT_DEV_NEXUS}</nexus.url>
+			</properties>
+
+			<distributionManagement>
+				<repository>
+					<id>JIT release repository</id>
+					<url>${env.JIT_DEV_NEXUS_REPOSITORY_RELEASES}</url>
+				</repository>
+				<snapshotRepository>
+					<id>JIT snapshot repository</id>
+					<url>${env.JIT_DEV_NEXUS_REPOSITORY_SNAPSHOTS}</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
     </profiles>
 
     <distributionManagement>
