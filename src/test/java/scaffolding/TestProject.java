@@ -120,7 +120,7 @@ public class TestProject {
     }
 
     public static String dirToGitScmReference(File sourceDir) {
-        return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/').toLowerCase();
+        return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/');
     }
 
     public static TestProject singleModuleProject() {
