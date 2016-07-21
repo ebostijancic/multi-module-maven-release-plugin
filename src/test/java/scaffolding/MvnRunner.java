@@ -58,6 +58,7 @@ public class MvnRunner {
 
     public List<String> runMaven(File workingDir, String... arguments) {
         InvocationRequest request = new DefaultInvocationRequest();
+        request.setUserSettingsFile(new File("test-projects/settings.xml"));
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
 
