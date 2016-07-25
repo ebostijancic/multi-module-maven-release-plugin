@@ -7,7 +7,7 @@
    | The path to the local repository maven will use to store artifacts.
    |
    | Default: ~/.m2/repository -->
-  <localRepository>target/.m2/repository</localRepository>
+  <localRepository>${env.JIT_DEV_HOME}/.m2/${env.JIT_DEV_SERVER}/repository</localRepository>
 
   <!-- pluginGroups
    | This is a list of additional group identifiers that will be searched when resolving plugins by their prefix, i.e.
