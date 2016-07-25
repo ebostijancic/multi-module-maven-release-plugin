@@ -19,8 +19,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class MvnRunner {
 
     private static boolean haveInstalledPlugin = false;
+    public static boolean logToStandardOut = true;
     private final File mvnHome;
-    public boolean logToStandardOut = false;
 
     public MvnRunner() {
         this(null);
@@ -29,8 +29,12 @@ public class MvnRunner {
     public MvnRunner(File mvnHome) {
         this.mvnHome = mvnHome;
     }
+    
+    public File getMvnHome() {
+		return mvnHome;
+	}
 
-    public static MvnRunner mvn(String version) {
+	public static MvnRunner mvn(String version) {
         System.out.println("Ensuring maven " + version + " is available");
         MvnRunner mvnRunner = new MvnRunner();
         String dirWithMavens = "target/mavens/" + version;
@@ -63,7 +67,6 @@ public class MvnRunner {
         request.setBaseDirectory(workingDir);
 
         Invoker invoker = new DefaultInvoker();
-
         invoker.setMavenHome(mvnHome);
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
@@ -87,6 +90,10 @@ public class MvnRunner {
     }
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {
+    	assertArtifactInLocalRepo(groupId, artifactId, version, null);
+    }
+
+    public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version, File mvnHome) throws IOException, MavenInvocationException {
         String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
         File temp = new File("target/downloads/" + UUID.randomUUID());
 
@@ -99,7 +106,9 @@ public class MvnRunner {
 
         request.setProperties(props);
         Invoker invoker = new DefaultInvoker();
-        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setMavenHome(mvnHome);
+
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
         InvocationResult result = invoker.execute(request);
 
@@ -114,5 +123,4 @@ public class MvnRunner {
 
         assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
-
 }
