@@ -62,12 +62,12 @@ public class MvnRunner {
 
     public List<String> runMaven(File workingDir, String... arguments) {
         InvocationRequest request = new DefaultInvocationRequest();
-        request.setUserSettingsFile(new File("test-projects/settings.xml"));
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
 
         Invoker invoker = new DefaultInvoker();
         invoker.setMavenHome(mvnHome);
+        invoker.setLocalRepositoryDirectory(new File(System.getProperty("user.home", "~") + "/.m2/repository"));
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
