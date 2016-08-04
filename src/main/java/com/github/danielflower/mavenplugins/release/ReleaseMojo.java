@@ -1,13 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -15,6 +7,14 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Releases the project.
@@ -83,6 +83,12 @@ public class ReleaseMojo extends BaseMojo {
 	 */
 	@Parameter(alias = "globalSettings")
 	private File globalSettings;
+        
+    /**
+     * Push tags to remote repository as they are created.
+     */
+    @Parameter(alias = "pushTags", defaultValue="true", property="push")
+    private boolean pushTags;
     
 
     @Override
@@ -92,7 +98,8 @@ public class ReleaseMojo extends BaseMojo {
         try {
             configureJsch(log);
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
+
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm()));
             repo.errorIfNotClean();
 
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
@@ -138,11 +145,15 @@ public class ReleaseMojo extends BaseMojo {
     private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
         for (AnnotatedTag proposedTag : proposedTags) {
             log.info("About to tag the repository with " + proposedTag.name());
-            repo.tagRepoAndPush(proposedTag);
+            if (pushTags) {
+                repo.tagRepoAndPush(proposedTag);
+            } else {
+                repo.tagRepo(proposedTag);
+            }
         }
     }
 
-    private static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
+    static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
         if (scm == null) {
             return null;
         }
@@ -189,7 +200,7 @@ public class ReleaseMojo extends BaseMojo {
         return result.alteredPoms;
     }
 
-    private static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
+    static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (ReleasableModule module : modules) {
             if (!module.willBeReleased()) {
@@ -222,23 +233,6 @@ public class ReleaseMojo extends BaseMojo {
             throw new ValidationException(summary, messages);
         }
         return tags;
-    }
-
-    private static void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
-        log.error("");
-        log.error("");
-        log.error("");
-        log.error("************************************");
-        log.error("Could not execute the release plugin");
-        log.error("************************************");
-        log.error("");
-        log.error("");
-        for (String line : linesToLog) {
-            log.error(line);
-        }
-        log.error("");
-        log.error("");
-        throw new MojoExecutionException(terseMessage);
     }
 
 }
