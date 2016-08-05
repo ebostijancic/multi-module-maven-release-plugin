@@ -343,6 +343,40 @@
             </build>
         </profile>
 
+        <profile>
+            <id>jit-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.3</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
 		<profile>
 			<id>jit</id>
 			<properties>
@@ -359,6 +393,26 @@
 					<url>${env.JIT_DEV_NEXUS_REPOSITORY_SNAPSHOTS}</url>
 				</snapshotRepository>
 			</distributionManagement>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.danielflower.mavenplugins</groupId>
+						<artifactId>multi-module-maven-release-plugin</artifactId>
+						<version>${project.version}</version>
+						<configuration>
+							<releaseGoals>
+								<releaseGoal>clean</releaseGoal>
+								<releaseGoal>site</releaseGoal>
+								<releaseGoal>deploy</releaseGoal>
+							</releaseGoals>
+							<releaseProfiles>
+								<releaseProfile>jit-release</releaseProfile>
+							</releaseProfiles>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
     </profiles>
 
