@@ -90,8 +90,13 @@ public class PomUpdater {
 
         Properties projectProperties = project.getProperties();
         for (Dependency dependency : originalModel.getDependencies()) {
+<<<<<<< HEAD
             String version = dependency.getVersion();
             if (isSnapshot(resolveVersion(version, projectProperties))) {
+=======
+            String version = resolveVersionOfDependency(dependency, projectProperties);
+            if (isSnapshot(version)) {
+>>>>>>> branch 'feature/support-dependency-management' of ssh://git@git.dev.jit.lan/jit-opensource/multi-module-maven-release-plugin.git
                 try {
                     ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
                     dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
@@ -113,12 +118,19 @@ public class PomUpdater {
         return errors;
     }
     
+<<<<<<< HEAD
 	private String resolveVersion(String version, Properties projectProperties) {
 		if (version != null && version.startsWith("${")) {
 			return projectProperties.getProperty(version.replace("${", "").replace("}", ""), version);
 		}
 		return version;
 	}
+=======
+    private String resolveVersionOfDependency(Dependency dependency, Properties projectProperties) {
+    	String version = dependency.getVersion().replace("${", "").replace("}", "");
+    	return projectProperties.getProperty(version, version);
+    }
+>>>>>>> branch 'feature/support-dependency-management' of ssh://git@git.dev.jit.lan/jit-opensource/multi-module-maven-release-plugin.git
 
     private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
         return plugin.getGroupId().equals("com.github.danielflower.mavenplugins") && plugin.getArtifactId().equals("multi-module-maven-release-plugin");
