@@ -30,8 +30,8 @@
     </ciManagement>
 
     <scm>
-        <url>https://github.com/danielflower/multi-module-maven-release-plugin</url>
-        <connection>scm:git:git@github.com:danielflower/multi-module-maven-release-plugin.git</connection>
+		<connection>scm:git:git@gitlab:jit-opensource/multi-module-maven-release-plugin.git</connection>
+		<developerConnection>scm:git:git@gitlab:jit-opensource/multi-module-maven-release-plugin.git</developerConnection>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
