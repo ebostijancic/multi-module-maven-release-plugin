@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+# 2.0.6.jit-SNAPSHOT
+
+* Fix broken SNAPSHOT detection in case property is used for dependency version.
+
 ### 2.0.4
 
 * The SCM details are no longer inherited from parent POMs.
