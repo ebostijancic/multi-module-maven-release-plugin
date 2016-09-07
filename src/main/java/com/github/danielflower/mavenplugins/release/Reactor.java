@@ -60,6 +60,17 @@ public class Reactor {
                             break;
                         }
                     }
+
+                    if (project.getModel().getDependencyManagement() != null) {
+                        for (Dependency dependency : project.getModel().getDependencyManagement().getDependencies()) {
+                            if (dependency.getLocation("").getSource().getModelId().startsWith(module.getGroupId() + ":" + module.getArtifactId())) {
+                                oneOfTheDependenciesHasChanged = true;
+                                changedDependency = module.getArtifactId();
+                                break;
+                            }
+                        }
+                    }
+
                     if (project.getParent() != null
                             && (project.getParent().getGroupId().equals(module.getGroupId()) && project.getParent().getArtifactId().equals(module.getArtifactId()))) {
                         oneOfTheDependenciesHasChanged = true;
