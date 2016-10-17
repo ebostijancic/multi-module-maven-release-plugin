@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.github.danielflower.mavenplugins.release.MavenVersionResolver.resolveVersionsDefinedThroughProperties;
+
 public class Reactor {
 
     private final List<ReleasableModule> modulesInBuildOrder;
@@ -30,6 +32,9 @@ public class Reactor {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();
+
+        resolveVersionsDefinedThroughProperties(projects);
+
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
@@ -113,6 +118,8 @@ public class Reactor {
 
         return new Reactor(modules);
     }
+
+
 
     private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allRemoteTags();
