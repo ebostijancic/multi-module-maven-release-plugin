@@ -163,11 +163,6 @@ public class TestProject {
         return project("dependencymanagement");
     }
 
-    public static TestProject dependencyManagementBomProject() {
-        return project("dependencymanagement/root-bom");
-    }
-
-
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }
@@ -182,5 +177,7 @@ public class TestProject {
     public void setMvnRunner(MvnRunner mvnRunner) {
         this.mvnRunner = mvnRunner;
     }
+
+    public static TestProject dependencyManagementWithVersionProperty(){return project("dependencymanagement-with-property");}
 
 }
