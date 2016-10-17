@@ -1,14 +1,12 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
-
 import java.util.List;
 import java.util.Properties;
 
-public class MavenVersionResolver {
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 
+public class MavenVersionResolver {
 
     public static void resolveVersionsDefinedThroughProperties(List<MavenProject> projects) {
         for (MavenProject project : projects) {
