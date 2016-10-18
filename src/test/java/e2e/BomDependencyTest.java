@@ -27,9 +27,9 @@ public class BomDependencyTest {
     @Test
     public void willReleaseAllWhenBomIsChanged() throws Exception {
         testProject.mvnRelease("1");
-
         testProject.commitRandomFile("root-bom").pushIt();
         List<String> output = testProject.mvnRelease("2");
+
         assertTagExists("root-bom-1.0.2");
         assertTagExists("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
@@ -48,9 +48,9 @@ public class BomDependencyTest {
     @Test
     public void willReleaseAllButBomWhenParentIsChanged() throws Exception {
         testProject.mvnRelease("1");
-
         testProject.commitRandomFile("parent-module").pushIt();
         List<String> output = testProject.mvnRelease("2");
+
         assertTagDoesNotExist("root-bom-1.0.2");
         assertTagExists("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
@@ -69,9 +69,9 @@ public class BomDependencyTest {
     @Test
     public void willReleaseConsoleAppAndCoreUtilsWhenCoreUtilsIsChanged() throws Exception {
         testProject.mvnRelease("1");
-
         testProject.commitRandomFile("the-core-utilities").pushIt();
         List<String> output = testProject.mvnRelease("2");
+
         assertTagDoesNotExist("root-bom-1.0.2");
         assertTagDoesNotExist("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
@@ -90,9 +90,9 @@ public class BomDependencyTest {
     @Test
     public void willReleaseOnlyConsoleAppWhenConsoleAppIsChanged() throws Exception {
         testProject.mvnRelease("1");
-
         testProject.commitRandomFile("console-app").pushIt();
         List<String> output = testProject.mvnRelease("2");
+
         assertTagDoesNotExist("root-bom-1.0.2");
         assertTagDoesNotExist("parent-module-1.2.3.2");
         assertTagDoesNotExist("core-utils-2.0.2");
