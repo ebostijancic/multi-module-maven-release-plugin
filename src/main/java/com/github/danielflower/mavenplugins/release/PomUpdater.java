@@ -132,7 +132,12 @@ public class PomUpdater {
         return errors;
     }
     
-
+	private String resolveVersion(String version, Properties projectProperties) {
+		if (version != null && version.startsWith("${")) {
+			return projectProperties.getProperty(version.replace("${", "").replace("}", ""), version);
+		}
+		return version;
+	}
 
     private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
         return plugin.getGroupId().equals("com.github.danielflower.mavenplugins") && plugin.getArtifactId().equals("multi-module-maven-release-plugin");

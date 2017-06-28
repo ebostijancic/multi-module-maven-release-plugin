@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "2.0.6.jit-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "2.1.3.jit-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 
@@ -47,23 +47,12 @@ public class TestProject {
         return mvnRunner.runMavenWithProfile(localDir, profile, arguments);
     }
 
-    public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:release");
+    public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:release", buildNumber, arguments);
     }
 
-    public List<String> mvnReleaserNext(String buildNumber) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:next");
-    }
-
-    public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "-DmodulesToRelease=" + moduleToRelease,
-            "releaser:release");
+    public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:next", buildNumber, arguments);
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
@@ -81,6 +70,14 @@ public class TestProject {
 
     public void pushIt() throws GitAPIException {
         local.push().call();
+    }
+
+    private List<String> mvnRun(String goal, String buildNumber, String[] arguments) {
+        String[] args = new String[arguments.length + 2];
+        args[0] = "-DbuildNumber=" + buildNumber;
+        System.arraycopy(arguments, 0, args, 1, arguments.length);
+        args[args.length-1] = goal;
+        return mvnRunner.runMaven(localDir, args);
     }
 
     private static TestProject project(String name) {
@@ -118,13 +115,13 @@ public class TestProject {
             xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
             FileUtils.writeStringToFile(pom, xml, "UTF-8");
         }
-        for (File child : sourceDir.listFiles((FileFilter) FileFilterUtils.directoryFileFilter())) {
+        for (File child : sourceDir.listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
             performPomSubstitution(child);
         }
     }
 
     public static String dirToGitScmReference(File sourceDir) {
-        return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/');
+        return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/').toLowerCase();
     }
 
     public static TestProject singleModuleProject() {
