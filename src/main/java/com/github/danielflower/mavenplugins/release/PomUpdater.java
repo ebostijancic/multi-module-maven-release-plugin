@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -87,7 +88,6 @@ public class PomUpdater {
                 errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
             }
         }
-
         Properties projectProperties = project.getProperties();
         for (Dependency dependency : originalModel.getDependencies()) {
             String version = dependency.getVersion();
@@ -99,28 +99,9 @@ public class PomUpdater {
                 } catch (UnresolvedSnapshotDependencyException e) {
                     errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
                 }
-            }else
+            } else
                 log.debug(" Dependency on " + dependency.getArtifactId() + " kept at version " + dependency.getVersion());
         }
-        //Support for dependency management
-        if (originalModel.getDependencyManagement() != null) {
-            for (Dependency dependency : originalModel.getDependencyManagement().getDependencies()) {
-                String version = dependency.getVersion();
-                if (MavenVersionResolver.isSnapshot(MavenVersionResolver.resolveVersion(version, projectProperties))) {
-                    try {
-                        ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
-                        dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
-                        log.debug(" Dependency on " + dependencyBeingReleased.getArtifactId() + " rewritten to version " + dependencyBeingReleased.getVersionToDependOn());
-                    } catch (UnresolvedSnapshotDependencyException e) {
-                        errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
-                    }
-                }
-                else {
-                    log.debug(" Dependency on " + dependency.getArtifactId() + " kept at version " + dependency.getVersion());
-                }
-            }
-        }
-
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
             if (MavenVersionResolver.isSnapshot(MavenVersionResolver.resolveVersion(version, projectProperties))) {
@@ -131,8 +112,6 @@ public class PomUpdater {
         }
         return errors;
     }
-    
-
 
     private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
         return plugin.getGroupId().equals("com.github.danielflower.mavenplugins") && plugin.getArtifactId().equals("multi-module-maven-release-plugin");
