@@ -119,6 +119,7 @@ public class MvnRunner {
         request.setProperties(props);
         Invoker invoker = new DefaultInvoker();
         invoker.setMavenHome(mvnHome);
+        invoker.setLocalRepositoryDirectory(new File(System.getProperty("user.home", "~") + "/.m2/repository"));
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
