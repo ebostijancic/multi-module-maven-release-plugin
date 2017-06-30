@@ -70,6 +70,7 @@ public class MvnRunner {
     }
 
     private List<String> runMavenInternal(File workingDir, String profile, String[] arguments) {
+    	System.out.println("runMavenInternal: workingDir=" + workingDir.getAbsolutePath());
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
