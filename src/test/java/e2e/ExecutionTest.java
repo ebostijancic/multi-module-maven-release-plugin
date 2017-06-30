@@ -40,7 +40,7 @@ public class ExecutionTest {
 
     @Test
     public void userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters() throws Exception {
-        File globalSettings = new File("test-projects/module-with-profiles/custom-settings.xml");
+        File globalSettings = new File(testProject.localDir.getAbsolutePath() + "/custom-settings.xml");
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",
             "releaser:release", "-gs", globalSettings.getCanonicalPath());
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
