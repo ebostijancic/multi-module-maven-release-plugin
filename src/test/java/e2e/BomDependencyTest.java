@@ -9,6 +9,7 @@ import static scaffolding.GitMatchers.hasTag;
 import java.util.List;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,10 +19,21 @@ import scaffolding.TestProject;
 public class BomDependencyTest {
 
     final TestProject testProject = TestProject.dependencyManagementProject();
+    boolean projectBuiltOnce = false;
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
         MvnRunner.installReleasePluginToLocalRepo();
+    }
+    
+    @Before
+    public void buildProjectOnce() throws Exception {
+    	if (projectBuiltOnce) {
+    		return;
+    	}
+    	
+    	testProject.mvn("install");
+    	projectBuiltOnce = true;
     }
 
     @Test
