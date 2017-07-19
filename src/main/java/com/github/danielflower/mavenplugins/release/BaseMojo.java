@@ -1,5 +1,9 @@
 package com.github.danielflower.mavenplugins.release;
 
+import static java.lang.String.format;
+
+import java.util.List;
+
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -12,10 +16,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
-
-import java.util.List;
-
-import static java.lang.String.format;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com

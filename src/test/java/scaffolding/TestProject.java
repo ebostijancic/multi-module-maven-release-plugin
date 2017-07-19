@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "2.1.3.jit-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 
@@ -41,6 +41,12 @@ public class TestProject {
      */
     public List<String> mvn(String... arguments) throws IOException {
         return mvnRunner.runMaven(localDir, arguments);
+    }
+
+    public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
+        return mvnRunner.runMaven(localDir,
+            "-DbuildNumber=" + buildNumber,
+            "releaser:release");
     }
 
     public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
@@ -147,13 +153,23 @@ public class TestProject {
     public static TestProject parentAsSibilngProject() {
         return project("parent-as-sibling");
     }
+
     public static TestProject deepDependenciesProject() {
         return project("deep-dependencies");
     }
 
+    public static TestProject dependencyManagementProject() {
+        return project("dependencymanagement");
+    }
+
+    public static TestProject dependencyManagementUsingParentModuleVersionPropertyProject() {
+	    return project("dependencymanagement-using-parent-module-version-property");
+    }
+    
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }
+
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
     }

@@ -1,5 +1,6 @@
 package scaffolding;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.shared.invoker.*;
 
@@ -19,8 +20,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class MvnRunner {
 
     private static boolean haveInstalledPlugin = false;
+    public static boolean logToStandardOut = true;
     private final File mvnHome;
-    public boolean logToStandardOut = false;
 
     public MvnRunner() {
         this(null);
@@ -29,8 +30,12 @@ public class MvnRunner {
     public MvnRunner(File mvnHome) {
         this.mvnHome = mvnHome;
     }
+    
+    public File getMvnHome() {
+		return mvnHome;
+	}
 
-    public static MvnRunner mvn(String version) {
+	public static MvnRunner mvn(String version) {
         System.out.println("Ensuring maven " + version + " is available");
         MvnRunner mvnRunner = new MvnRunner();
         String dirWithMavens = "target/mavens/" + version;
@@ -57,13 +62,25 @@ public class MvnRunner {
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {
+        return runMavenInternal(workingDir, null, arguments);
+    }
+
+    public List<String> runMavenWithProfile(File workingDir, String profile, String...arguments) {
+        return runMavenInternal(workingDir, profile, arguments);
+    }
+
+    private List<String> runMavenInternal(File workingDir, String profile, String[] arguments) {
+    	System.out.println("runMavenInternal: workingDir=" + workingDir.getAbsolutePath());
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
+        if (profile != null) {
+            request.setProfiles(Arrays.asList(new String[]{profile}));
+        }
 
         Invoker invoker = new DefaultInvoker();
-
         invoker.setMavenHome(mvnHome);
+        invoker.setLocalRepositoryDirectory(new File(System.getProperty("user.home", "~") + "/.m2/repository"));
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
@@ -86,6 +103,10 @@ public class MvnRunner {
     }
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {
+    	assertArtifactInLocalRepo(groupId, artifactId, version, null);
+    }
+
+    public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version, File mvnHome) throws IOException, MavenInvocationException {
         String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
         File temp = new File("target/downloads/" + UUID.randomUUID());
 
@@ -98,7 +119,10 @@ public class MvnRunner {
 
         request.setProperties(props);
         Invoker invoker = new DefaultInvoker();
-        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setMavenHome(mvnHome);
+        invoker.setLocalRepositoryDirectory(new File(System.getProperty("user.home", "~") + "/.m2/repository"));
+
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
         InvocationResult result = invoker.execute(request);
 
@@ -113,5 +137,4 @@ public class MvnRunner {
 
         assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
-
 }
